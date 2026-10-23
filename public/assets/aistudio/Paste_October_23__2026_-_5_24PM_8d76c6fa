@@ -1,0 +1,973 @@
+# CivicPulse AI — Complete Full-Stack Application Development Master Prompt
+
+## 1. Project Overview
+
+Act as a senior full-stack software engineer, AI engineer, mobile application developer, UI/UX designer, database architect, and security engineer.
+
+Build a complete, functional, end-to-end civic complaint management platform called **CivicPulse AI** from scratch.
+
+CivicPulse AI is a multilingual, AI-powered civic complaint reporting and accountability platform. It allows citizens to report public problems, automatically identifies the responsible government department or authority, routes complaints to the appropriate destination, tracks delivery and acknowledgement, monitors resolution deadlines, and escalates unresolved complaints.
+
+The platform must contain three connected applications:
+
+1. **Citizen mobile application:** Flutter and Dart for Android.
+2. **Backend and AI services:** Python and FastAPI.
+3. **Authority administration dashboard:** React, TypeScript, and Vite.
+
+All three applications must communicate with the same backend and database.
+
+Build a working application, not merely a UI mockup, static prototype, or collection of disconnected screens.
+
+Create all source code, project configuration, database models, API endpoints, frontend screens, AI modules, tests, and setup documentation required to run the project.
+
+Do not assume that any existing codebase, backend, database, or application is available. Start with a clean project structure.
+
+## 2. Main Objective
+
+The core problem CivicPulse AI solves is that citizens often do not know which government department is responsible for a civic issue, where to submit their complaint, or how to ensure it reaches the right authority.
+
+The application must therefore do more than accept complaints.
+
+**Every complaint must go through a complete responsibility and delivery workflow:**
+
+1. Understand the complaint.
+2. Identify the location and type of problem.
+3. Determine the responsible department and authority.
+4. Find the correct configured delivery destination.
+5. Route the complaint through a supported delivery mechanism.
+6. Record whether delivery succeeded or failed.
+7. Track acknowledgement from the receiving authority.
+8. Monitor the resolution deadline.
+9. Notify the citizen of progress.
+10. Escalate overdue or unacknowledged complaints according to configured rules.
+11. Verify and record the resolution.
+
+Never treat a complaint as successfully submitted to a government authority simply because it was saved in the CivicPulse AI database.
+
+## 3. Technology Stack
+
+Use the following stack unless a technical limitation requires a clearly documented alternative.
+
+### Citizen mobile application
+- Flutter.
+- Dart.
+- Material 3 interface.
+- Android support.
+- Camera and gallery integration.
+- GPS and location services.
+- Speech-to-text integration.
+- Multilingual user interface.
+- REST API communication.
+
+### Backend
+- Python.
+- FastAPI.
+- Pydantic validation.
+- SQLAlchemy ORM.
+- Alembic database migrations.
+- PostgreSQL for production.
+- SQLite support for convenient local development.
+- JWT-based authentication.
+- Role-based access control.
+- Background jobs for retries, reminders, and escalation.
+- OpenAPI documentation.
+
+### Authority dashboard
+- React.
+- TypeScript.
+- Vite.
+- Responsive design.
+- Reusable components.
+- Charts and reporting.
+- Interactive complaint management.
+- Maps and location visualizations where available.
+
+### AI capabilities
+Use a configurable AI provider abstraction so a supported model can be connected through environment variables. Provide practical local fallback implementations for core features.
+
+AI integrations must not make the entire application unusable when a provider key is missing.
+
+## 4. Citizen Registration and Authentication
+
+Implement:
+- User registration and login.
+- Secure password hashing.
+- JWT access tokens and refresh-token handling where appropriate.
+- Logout.
+- User profile management.
+- Language preference.
+- Basic account settings.
+- Input validation.
+- Authentication error handling.
+- Appropriate access controls for citizen and authority accounts.
+
+Support Tamil and English from the beginning.
+
+Design the architecture so that additional Indian languages can be added later.
+
+Use demo accounts and seeded data for development, but clearly distinguish demo accounts from production authentication.
+
+## 5. Multilingual Complaint Submission
+
+Citizens must be able to submit complaints using a simple, accessible interface.
+
+Allow users to:
+
+- Enter a complaint title.
+- Describe the problem using text.
+- Select a complaint category manually.
+- Write in Tamil or English.
+- Record speech and convert it to text.
+- Translate text between Tamil and English when a translation provider is configured.
+- Attach photographs.
+- Attach video where supported.
+- Capture the current GPS location.
+- Correct the location manually.
+- Select an address or landmark.
+- Review all details before submission.
+
+Suggested complaint categories include:
+
+- Roads and potholes.
+- Water supply.
+- Drainage and sewage.
+- Garbage collection.
+- Streetlights.
+- Public sanitation.
+- Electricity-related public infrastructure.
+- Public transport infrastructure.
+- Encroachment.
+- Public safety infrastructure.
+- Other civic issues.
+
+Make categories configurable rather than hardcoding them throughout the application.
+
+Validate media type and size. Store uploaded files safely and retain their references in the database. Do not expose private upload directories publicly.
+
+If a device permission is denied or GPS is unavailable, provide a usable manual alternative.
+
+## 6. AI Complaint Understanding
+
+Build an AI complaint-processing module that can:
+
+- Classify complaints into categories.
+- Extract relevant keywords.
+- Identify the location mentioned in the text.
+- Detect language.
+- Generate a concise complaint summary.
+- Estimate urgency.
+- Explain why a priority level was assigned.
+- Recommend the responsible department.
+- Detect possible duplicate complaints.
+- Identify missing information and request clarification.
+
+Return structured results rather than unvalidated free-form model output.
+
+Every AI prediction must include an appropriate confidence score or uncertainty indicator when supported.
+
+Allow citizens to correct the category or location before submitting.
+
+If the AI cannot confidently classify a complaint or determine its responsible authority, mark it for human review rather than silently guessing.
+
+Do not allow AI to invent official contact details, department names, service-level agreements, or delivery confirmations.
+
+## 7. Intelligent Authority Identification and Routing
+
+**This is a mandatory core feature, not an optional enhancement.**
+
+The application must automatically determine which authority or government department is responsible for each complaint.
+
+### A. Build an authority directory
+
+Create a database-backed authority directory containing:
+
+- Authority ID.
+- Authority name.
+- Government level: local, municipal, district, state, or other configured level.
+- Department name.
+- Responsibility categories.
+- Jurisdiction boundaries or supported geographic areas.
+- State, district, city, municipality, ward, and postal-code information where available.
+- Official contact information.
+- Configured email, API, portal, or other supported delivery destination.
+- Delivery method.
+- Escalation authority.
+- Expected acknowledgement time.
+- Resolution deadline or service-level agreement.
+- Whether the authority record is verified.
+- Directory data source.
+- Last verification date.
+- Active or inactive status.
+
+Make this directory editable by authorized administrators.
+
+Support importing verified authority records through CSV or another documented import format.
+
+Do not populate the directory with invented official contacts presented as real. Mark demonstration entries as sample data.
+
+### B. Determine the responsible authority
+
+When a complaint is submitted, evaluate:
+
+1. Complaint category.
+2. AI-generated category prediction.
+3. Citizen-confirmed category.
+4. GPS coordinates and address.
+5. Administrative jurisdiction.
+6. Department responsibility rules.
+7. Authority directory records.
+8. Available verified delivery channels.
+9. Routing confidence.
+
+For example:
+
+- A pothole should be routed to the configured road-maintenance authority responsible for that road.
+- A blocked municipal drain should be routed to the responsible drainage or sanitation department.
+- A streetlight failure should be routed to the department responsible for that streetlight and location.
+- A water-supply interruption should be routed to the relevant water-supply authority.
+- A problem outside the known jurisdiction should be flagged for clarification or manual review.
+
+These are examples of routing logic, not claims that every locality uses the same department structure.
+
+Use configurable rules and geographic jurisdiction data. Do not rely exclusively on an AI language model to choose an authority.
+
+### C. Authority confidence and human review
+
+Generate a routing decision containing:
+
+- Recommended authority.
+- Recommended department.
+- Complaint category.
+- Jurisdiction match.
+- Confidence score.
+- Explanation for the routing decision.
+- Alternative candidate authorities when appropriate.
+- Delivery method.
+- Review requirement.
+
+If multiple authorities appear responsible, the location is ambiguous, or the confidence is too low, request clarification or send the complaint to an authorized routing-review queue.
+
+Never automatically dispatch a sensitive or uncertain complaint to an arbitrary recipient.
+
+### D. Authority delivery
+
+Implement a pluggable delivery service supporting:
+
+- Official authority APIs when available and authorized.
+- Email integration when configured.
+- Authorized webhooks.
+- Other documented, permitted integrations.
+
+Create a common delivery interface so new official integrations can be added without rewriting complaint management.
+
+For each delivery attempt, store:
+
+- Complaint ID.
+- Destination authority.
+- Destination identifier.
+- Delivery method.
+- Attempt number.
+- Timestamp.
+- Request or external reference ID where available.
+- Delivery result.
+- Error details with sensitive data redacted.
+- Next retry time.
+- Delivery receipt or acknowledgement reference when available.
+
+Implement retry logic with exponential backoff and safeguards against duplicate submissions. Use idempotency keys where supported.
+
+A temporary network failure must not silently discard a complaint.
+
+### E. Distinguish delivery from acknowledgement
+
+Maintain separate states for internal submission, external delivery, and authority acknowledgement.
+
+Suggested states include:
+
+- Draft.
+- Submitted to CivicPulse AI.
+- Awaiting authority identification.
+- Awaiting routing review.
+- Ready for delivery.
+- Delivery pending.
+- Delivery failed.
+- Delivered to configured destination.
+- Awaiting authority acknowledgement.
+- Acknowledged by authority.
+- In progress.
+- Resolved.
+- Resolution awaiting citizen verification.
+- Closed.
+- Escalated.
+
+Only mark a complaint as **Delivered** when the configured delivery mechanism provides evidence of successful delivery according to its documented semantics.
+
+Only mark a complaint as **Acknowledged by authority** when a valid acknowledgement is received through an integrated channel or recorded by an authorized operator.
+
+A successful email send, for example, must not automatically be described as an authority acknowledgement.
+
+If no official integration is available, deliver the complaint to the CivicPulse AI authority dashboard and explicitly label the destination as the internal CivicPulse AI system. Do not claim that an external government department received it.
+
+### F. Delivery failure handling
+
+When delivery fails:
+
+- Keep the complaint and its evidence.
+- Display the failure state.
+- Record the reason.
+- Retry according to configured policy.
+- Notify authorized administrators.
+- Provide a manual review and retry action.
+- Allow an authorized operator to select a corrected destination.
+- Preserve the history of previous attempts.
+
+Do not repeatedly send complaints without appropriate safeguards.
+
+### G. Acknowledgement and escalation
+
+Track the acknowledgement deadline separately from the resolution deadline.
+
+If acknowledgement is not received within the configured period:
+
+- Trigger a reminder or retry where appropriate.
+- Notify the authorized administrator.
+- Place the complaint in an acknowledgement-overdue queue.
+- Escalate to the configured higher authority if permitted by the routing rules.
+- Record the escalation event.
+- Notify the citizen of the actual escalation status.
+
+Escalation must follow verified, configurable authority relationships. Do not invent an escalation recipient.
+
+## 8. Complaint Tracking
+
+Every complaint must receive a unique human-readable reference number and an internal database ID.
+
+Provide a citizen tracking screen showing:
+
+- Reference number.
+- Complaint summary.
+- Category.
+- Reported location.
+- Submission date.
+- Assigned authority and department.
+- Authority identification status.
+- Delivery status.
+- Acknowledgement status.
+- Resolution deadline.
+- Current complaint status.
+- Last update.
+- Timeline of important events.
+- Escalation history.
+- Resolution evidence where available.
+
+Show a clear timeline from submission to final resolution.
+
+Keep the delivery status and complaint resolution status separate. A complaint can be delivered without being acknowledged, and acknowledged without being resolved.
+
+Citizens must only see information they are authorized to access.
+
+## 9. Duplicate Complaint Detection
+
+Before creating a new complaint, compare it with relevant existing complaints using:
+
+- Text similarity.
+- Category.
+- Geographic proximity.
+- Submission time.
+- Related location or landmark.
+- Image similarity where a supported implementation is available.
+
+Show a warning when a similar complaint already exists.
+
+Allow the citizen to view and follow the existing complaint when appropriate, or submit a new report if it concerns a distinct issue.
+
+Do not automatically merge complaints solely because they are similar.
+
+Keep the original report and its evidence intact.
+
+## 10. Explainable Priority and Deadline Management
+
+Create a configurable priority-scoring system that considers factors such as:
+
+- Potential public safety impact.
+- Severity.
+- Number of affected people, when known.
+- Infrastructure importance.
+- Time already unresolved.
+- Verified urgency indicators.
+- Similar reports from the same area.
+
+Possible priority levels:
+
+- Low.
+- Medium.
+- High.
+- Critical.
+
+Display a human-readable explanation of the priority decision.
+
+Do not claim that an AI-generated severity score is an official government priority.
+
+Allow authorized administrators to correct priority and record the reason.
+
+Configure acknowledgement deadlines, resolution deadlines, reminders, and escalation policies by complaint category, jurisdiction, and authority.
+
+Do not invent legally binding deadlines. Clearly mark demonstration service-level agreements as sample configurations.
+
+Use background jobs or scheduled workers to detect overdue complaints and trigger permitted actions.
+
+## 11. Authority Administration Dashboard
+
+Build a professional, responsive React and TypeScript dashboard for authorized civic administrators.
+
+### Dashboard overview
+
+Display:
+
+- Total complaints.
+- Newly submitted complaints.
+- Complaints awaiting authority identification.
+- Complaints awaiting delivery.
+- Failed deliveries.
+- Complaints awaiting acknowledgement.
+- Acknowledgement-overdue complaints.
+- In-progress complaints.
+- Overdue resolutions.
+- Escalated complaints.
+- Resolved complaints.
+- Category distribution.
+- Priority distribution.
+- Geographic hotspots when location data is available.
+- Complaint trends over time.
+
+Clearly label sample data and do not present it as live government statistics.
+
+### Complaint management
+
+Authorized users must be able to:
+
+- View complaint details.
+- Search by reference number or keywords.
+- Filter by category, priority, date, location, authority, delivery status, acknowledgement status, and complaint status.
+- Inspect photos and other permitted evidence.
+- Review AI classification and its explanation.
+- Correct the category or location.
+- Confirm or change the responsible authority.
+- Assign complaints to authorized staff.
+- Update complaint status.
+- Set or adjust deadlines with an audit reason.
+- Retry failed delivery.
+- View delivery attempts and error details.
+- Record a valid authority acknowledgement.
+- Escalate a complaint through configured rules.
+- Add internal notes.
+- Upload resolution evidence.
+- Review the citizen's verification response.
+- Export authorized reports.
+
+### Authority routing management
+
+Create a dedicated authority-management section where authorized administrators can:
+
+- Add and edit authority records.
+- Configure categories and jurisdictions.
+- Manage department responsibility rules.
+- Configure permitted delivery channels.
+- Test supported integrations safely.
+- View delivery failures.
+- Manage retry policies.
+- Configure acknowledgement and resolution deadlines.
+- Configure escalation relationships.
+- Mark records as verified or unverified.
+- Review the source and last verification date of authority data.
+
+Protect all administrative actions through role-based permissions.
+
+## 12. Citizen Notifications
+
+Implement an extensible notification system.
+
+Support in-app notifications and provide an email or push-notification integration where configured.
+
+Notify citizens about:
+
+- Successful CivicPulse AI submission.
+- Authority identification.
+- Routing review requirements.
+- Delivery success or failure.
+- Authority acknowledgement.
+- Status changes.
+- Requests for additional information.
+- Deadline-related updates where appropriate.
+- Escalation.
+- Resolution.
+- Requests to verify the resolution.
+
+Never send a message stating that a government authority received or acknowledged a complaint unless the system has evidence supporting that statement.
+
+Use accurate language. For example:
+
+- “Your complaint has been saved in CivicPulse AI.”
+- “Your complaint has been delivered to the configured destination.”
+- “The receiving authority has acknowledged your complaint.”
+- “We could not confirm delivery. Your complaint remains available for review.”
+
+Implement notification history and prevent duplicate notifications when retrying background jobs.
+
+## 13. Resolution Verification
+
+Authorities or authorized administrators must be able to submit:
+
+- Resolution description.
+- Resolution timestamp.
+- Supporting photographs or documents.
+- Notes explaining the action taken.
+
+Notify the citizen when a resolution is recorded.
+
+Allow the citizen to:
+
+- Confirm the issue has been resolved.
+- Report that the issue remains unresolved.
+- Provide feedback.
+- Submit supporting evidence where appropriate.
+
+If the citizen disputes the resolution, reopen or flag the complaint according to configurable policy.
+
+Preserve the previous resolution and reopening history.
+
+Do not automatically treat an uploaded photograph or an administrator's status update as proof that the citizen agrees the issue is resolved.
+
+## 14. Maps and Civic Hotspots
+
+Provide a map interface where supported.
+
+Display complaint locations, category filters, priority levels, and hotspot clusters.
+
+Use geographic coordinates only when available and valid.
+
+Implement privacy-conscious location handling. Avoid exposing precise private addresses or personal information to unauthorized users.
+
+If mapping credentials or external map services are unavailable, provide a functional alternative using coordinates, addresses, and a list view.
+
+Do not fabricate geographic data or claim that sample hotspot statistics represent real civic conditions.
+
+## 15. Reports and Exports
+
+Provide dashboard reports for:
+
+- Complaints by category.
+- Complaints by location.
+- Complaints by responsible authority.
+- Delivery success and failure rates.
+- Acknowledgement delays.
+- Resolution times.
+- Overdue complaints.
+- Escalation counts.
+- Reopened complaints.
+- Citizen verification outcomes.
+
+Support CSV export and generate PDF reports where practical.
+
+Include the selected reporting period, generation time, and data-source context.
+
+Enforce authorization and protect personal information in exported reports.
+
+## 16. Database Design
+
+Create appropriate normalized database models and migrations for at least:
+
+- Users.
+- Roles and permissions.
+- Complaints.
+- Complaint attachments.
+- Complaint categories.
+- Geographic areas and jurisdictions.
+- Authorities.
+- Departments.
+- Authority responsibility rules.
+- Authority delivery destinations.
+- Routing decisions.
+- Delivery attempts.
+- Authority acknowledgements.
+- Complaint status history.
+- Complaint assignments.
+- Priority assessments.
+- Duplicate-detection results.
+- Resolution records.
+- Citizen verification records.
+- Notifications.
+- Escalation rules.
+- Escalation events.
+- Audit logs.
+- Application configuration.
+
+Use foreign keys, appropriate indexes, timestamps, validation constraints, and transaction handling.
+
+Preserve important historical records rather than overwriting the entire complaint history when a status changes.
+
+## 17. Backend API
+
+Build a documented FastAPI REST API.
+
+Provide suitable endpoints for:
+
+- Authentication and user profiles.
+- Complaint creation, retrieval, updates, and tracking.
+- Attachment uploads.
+- AI classification.
+- Translation and transcription integration.
+- Duplicate detection.
+- Priority assessment.
+- Authority directory queries and management.
+- Authority recommendation and routing.
+- Delivery submission and retry.
+- Delivery attempt history.
+- Authority acknowledgement.
+- Complaint assignments and status changes.
+- Deadlines and escalations.
+- Resolution evidence and citizen verification.
+- Notifications.
+- Dashboard statistics.
+- Geographic summaries.
+- Reports and exports.
+- Audit history.
+
+Use appropriate HTTP methods, status codes, request validation, response schemas, pagination, filtering, and error handling.
+
+Provide an interactive API documentation page through FastAPI's OpenAPI support.
+
+Ensure that protected endpoints enforce authentication, role permissions, and resource ownership.
+
+## 18. Security and Privacy
+
+Implement security from the beginning.
+
+Requirements include:
+
+- Password hashing using a suitable password-hashing algorithm.
+- JWT validation.
+- Role-based authorization.
+- Request validation.
+- Upload size and file-type restrictions.
+- Secure storage of uploaded media.
+- Environment-based secret management.
+- Rate limiting where appropriate.
+- CORS configuration.
+- Protection against common injection and access-control vulnerabilities.
+- Audit logging for sensitive administrative actions.
+- Redaction of secrets and sensitive information from logs.
+- Safe handling of external integration errors.
+- Appropriate retention and deletion policies.
+- Privacy-conscious location and personal-data access.
+
+Do not commit API keys, passwords, production credentials, or private tokens to source control.
+
+Provide an `.env.example` file containing placeholder configuration values only.
+
+## 19. User Interface and Experience
+
+Create a polished, modern, accessible interface suitable for a civic technology project.
+
+Use a consistent design system, readable typography, clear status labels, responsive layouts, loading indicators, empty states, and meaningful error messages.
+
+The citizen app should be simple enough for a first-time user.
+
+Prioritize:
+
+- Clear complaint submission.
+- Easy Tamil and English language switching.
+- Large touch targets.
+- Accessible forms.
+- Transparent delivery and acknowledgement status.
+- Clear instructions when information is missing.
+- Minimal unnecessary steps.
+- Usability on ordinary Android devices and slower networks.
+
+The dashboard should be data-oriented and suitable for administrative work.
+
+Do not use fake functionality in buttons. Every implemented button must have a real action, or it must be clearly identified as unavailable and documented.
+
+## 20. Suggested Project Structure
+
+Create a clean, maintainable repository with a structure similar to:
+
+    civicpulse-ai/
+      mobile/
+        lib/
+          core/
+          models/
+          services/
+          providers/
+          screens/
+          widgets/
+          routing/
+        test/
+        pubspec.yaml
+
+      backend/
+        app/
+          api/
+          core/
+          models/
+          schemas/
+          services/
+          ai/
+          routing/
+          delivery/
+          workers/
+          database/
+          tests/
+        migrations/
+        requirements.txt
+        .env.example
+
+      dashboard/
+        src/
+          components/
+          pages/
+          services/
+          hooks/
+          types/
+          layouts/
+        public/
+        package.json
+        .env.example
+
+      docs/
+        architecture.md
+        api.md
+        authority-routing.md
+        integrations.md
+        setup.md
+
+      docker-compose.yml
+      README.md
+      .gitignore
+
+You may adjust this structure when there is a clear technical reason, but keep the three applications organized and independent while sharing one backend contract.
+
+## 21. Testing Requirements
+
+Write automated tests for critical functionality.
+
+### Backend tests
+
+Test:
+
+- Registration and authentication.
+- Authorization and resource ownership.
+- Complaint creation and tracking.
+- Database persistence.
+- AI classification fallback.
+- Authority matching by category and jurisdiction.
+- Low-confidence routing and manual review.
+- Delivery success and failure.
+- Delivery retries and duplicate-send prevention.
+- Distinction between delivery and acknowledgement.
+- Acknowledgement deadline handling.
+- Escalation policy enforcement.
+- Status-history preservation.
+- Duplicate complaint warnings.
+- Resolution verification and reopening.
+- Input validation and upload restrictions.
+
+### Dashboard tests
+
+Test important interactions, filters, permissions, forms, error states, and API integration.
+
+### Mobile tests
+
+Test core form validation, API service behavior, complaint status rendering, and important navigation flows.
+
+### Integration tests
+
+Verify the complete workflow:
+
+1. A citizen submits a complaint.
+2. The complaint is saved.
+3. AI analyzes the complaint.
+4. The system identifies a responsible authority or requests manual review.
+5. The complaint is sent through the configured delivery adapter.
+6. The delivery result is recorded.
+7. Authority acknowledgement is recorded only when supported.
+8. The complaint appears correctly in the dashboard.
+9. Deadline and escalation rules are evaluated.
+10. The citizen sees accurate status updates.
+11. Resolution evidence is submitted.
+12. The citizen verifies or disputes the resolution.
+
+Tests must not require real government systems or real notification credentials. Use mock delivery adapters and test fixtures.
+
+## 22. Demo and Local Development
+
+Provide a complete local development environment.
+
+Include:
+
+- Database setup.
+- Database migrations.
+- Seed data.
+- Sample authority directory records.
+- A mock authority delivery adapter.
+- Sample citizen and administrator accounts.
+- A mock acknowledgement mechanism.
+- Sample complaints across multiple categories and locations.
+- Example API requests.
+- Instructions for running the backend.
+- Instructions for running the dashboard.
+- Instructions for running the Android application.
+- Instructions for configuring optional AI, email, push, and mapping integrations.
+
+Clearly mark sample authority records and sample contacts as demonstration data.
+
+The mock delivery adapter must demonstrate successful delivery, failure, retry, and acknowledgement workflows without claiming that any real government authority was contacted.
+
+## 23. External Integration Requirements
+
+Design all external integrations behind clear service interfaces.
+
+For AI services, translation, speech recognition, maps, email, push notifications, and official authority systems:
+
+- Read credentials from environment variables.
+- Document required setup.
+- Provide safe mock or local fallback behavior when practical.
+- Handle timeouts and failures.
+- Log integration outcomes without exposing secrets.
+- Test integration behavior using mocks.
+
+**Government authority integration is a special requirement:** actual external submission is possible only when an authorized, working destination and permitted integration are available. Do not invent official APIs, credentials, contact information, or successful submissions.
+
+If an official integration cannot be configured, the application must still work end to end within its own system. It must clearly display that the complaint has been received by CivicPulse AI and is awaiting external delivery or manual forwarding, as applicable.
+
+## 24. Implementation Workflow
+
+Develop the project in a controlled sequence.
+
+### Phase 1 — Foundation
+- Establish the repository structure.
+- Configure the database.
+- Create core data models and migrations.
+- Implement authentication and permissions.
+- Establish shared API conventions.
+- Add development configuration.
+
+### Phase 2 — Complaint and routing engine
+- Implement complaint submission and attachments.
+- Build the authority directory.
+- Implement category and jurisdiction matching.
+- Implement routing confidence and manual review.
+- Create delivery adapters and attempt history.
+- Add delivery retries and acknowledgement tracking.
+
+### Phase 3 — AI and accountability
+- Implement classification and priority explanations.
+- Add duplicate detection.
+- Implement deadline monitoring and escalation.
+- Add notification handling.
+- Add resolution evidence and citizen verification.
+
+### Phase 4 — Citizen application
+- Build the Flutter screens.
+- Connect authentication and complaint APIs.
+- Implement Tamil and English support.
+- Integrate media, location, and optional speech services.
+- Build tracking and notifications.
+
+### Phase 5 — Authority dashboard
+- Build the React dashboard.
+- Connect complaint management.
+- Implement authority and jurisdiction administration.
+- Add delivery monitoring, acknowledgement queues, escalation management, maps, and reports.
+
+### Phase 6 — Testing and delivery
+- Run database migrations.
+- Run automated tests.
+- Validate API integration.
+- Test the end-to-end demo workflow.
+- Fix build and runtime errors.
+- Complete setup and architecture documentation.
+
+## 25. Code Quality Requirements
+
+Generate real, executable source code.
+
+Do not:
+
+- Return only a plan.
+- Return only wireframes.
+- Return pseudocode for core functionality.
+- Create buttons with no actions.
+- Hardcode fake successful delivery responses.
+- Hardcode fake authority acknowledgements.
+- Pretend a mock service is a real government integration.
+- Claim tests passed unless they were actually run.
+- Leave essential modules as TODO comments.
+- Omit required imports, configuration, database models, or API schemas.
+- Use unverified government contact information as real.
+- silently substitute an unrelated technology stack.
+
+Use modular code, clear naming, type hints, reusable services, sensible error handling, and documentation.
+
+If the response cannot contain the entire codebase at once, work file by file in a consistent order. Maintain a checklist of created files and remaining work. Do not silently omit essential functionality.
+
+After generating each major module, explain how it connects to the rest of the application and provide the exact commands needed to run or test it.
+
+## 26. Final Deliverables
+
+The completed project must include:
+
+1. Flutter Android citizen application.
+2. FastAPI backend.
+3. React and TypeScript authority dashboard.
+4. Database models and migrations.
+5. AI complaint-processing module.
+6. Authority identification and jurisdiction-routing engine.
+7. Delivery adapters with retry handling.
+8. Separate delivery and acknowledgement tracking.
+9. Configurable deadlines and escalation.
+10. Complaint status timeline and audit history.
+11. Notification service.
+12. Resolution verification workflow.
+13. Reporting and export functionality.
+14. Sample authority directory and demo data.
+15. Automated tests.
+16. Docker or equivalent local development configuration.
+17. Environment-variable templates.
+18. API documentation.
+19. Setup instructions.
+20. Architecture and integration documentation.
+
+## 27. Acceptance Criteria
+
+The project is considered functionally complete only when the following scenario works in the local demo environment:
+
+A citizen opens CivicPulse AI, selects Tamil or English, creates an account, submits a complaint with a description and location, and receives a reference number.
+
+The backend analyzes the complaint, identifies the appropriate configured department using category and jurisdiction rules, and explains the routing decision.
+
+If the responsible authority is uncertain, the complaint is placed in a review queue rather than routed arbitrarily.
+
+The complaint is sent through a configured delivery adapter. Its actual delivery result and any retry attempts are stored.
+
+The citizen can see whether the complaint is awaiting routing, delivered to the configured destination, awaiting acknowledgement, acknowledged, or experiencing a delivery failure.
+
+The authority dashboard displays the same complaint, its routing decision, delivery history, acknowledgement history, and deadlines.
+
+The system can demonstrate a missed acknowledgement deadline, a permitted escalation, a notification, a resolution update, and citizen verification.
+
+All status changes and important actions are recorded in the audit history.
+
+The full demonstration workflow must function without real government credentials by using a clearly labelled mock authority adapter. Production delivery to an external government authority must remain dependent on a verified, authorized integration.
+
+## 28. Start Now
+
+Begin by generating the complete repository structure, architecture overview, database schema, and backend foundation.
+
+Then implement the application in the phases above, producing real files and runnable code.
+
+Prioritize a working end-to-end application while preserving the full architecture and all specified features.
+
+At every stage, be explicit about what is implemented, what is tested, what requires external credentials, and what remains incomplete.
+
+**The ultimate goal is CivicPulse AI: a reliable, multilingual civic accountability platform that does not merely record complaints, but intelligently identifies the responsible authority, transparently tracks delivery and acknowledgement, and follows the complaint through resolution.**

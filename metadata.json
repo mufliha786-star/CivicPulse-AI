@@ -1,0 +1,6 @@
+{
+  "name": "CivicPulse AI",
+  "description": "Multilingual AI-powered civic complaint reporting, intelligent authority routing, delivery tracking, and accountability platform.",
+  "requestFramePermissions": ["geolocation", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

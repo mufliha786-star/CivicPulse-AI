@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  civicpulse-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://civicpulse:civicpulse_secret@postgres:5432/civicpulse_db
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - SECRET_KEY=civicpulse_production_jwt_secret_key_2026
+    depends_on:
+      - postgres
+
+  civicpulse-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - civicpulse-backend
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=civicpulse
+      - POSTGRES_PASSWORD=civicpulse_secret
+      - POSTGRES_DB=civicpulse_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
